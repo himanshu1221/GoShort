@@ -10,3 +10,15 @@ func GetAllShorts() ([]Goshort, error) {
 
 	return goshorts, nil
 }
+
+func SingleShorts(id uint64) (Goshort, error) {
+	var goshort Goshort
+
+	tx := db.Where("id=?", id).First(&goshort)
+
+	if tx.Error != nil {
+		return goshort, tx.Error
+	}
+
+	return goshort, nil
+}
