@@ -22,3 +22,8 @@ func SingleShorts(id uint64) (Goshort, error) {
 
 	return goshort, nil
 }
+
+func CreateShort(goshort Goshort) error {
+	tx := db.Create(&goshort)
+	return tx.Error
+}
