@@ -33,7 +33,7 @@ func UpdateShort(goshort Goshort) error {
 	return tx.Error
 }
 
-func DeleteShort(goshort Goshort) error {
-	tx := db.Delete(&goshort)
+func DeleteShort(id uint64) error {
+	tx := db.Unscoped().Delete(&Goshort{}, id)
 	return tx.Error
 }
