@@ -32,3 +32,8 @@ func UpdateShort(goshort Goshort) error {
 	tx := db.Save(&goshort)
 	return tx.Error
 }
+
+func DeleteShort(goshort Goshort) error {
+	tx := db.Delete(&goshort)
+	return tx.Error
+}
