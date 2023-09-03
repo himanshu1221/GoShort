@@ -27,3 +27,8 @@ func CreateShort(goshort Goshort) error {
 	tx := db.Create(&goshort)
 	return tx.Error
 }
+
+func UpdateShort(goshort Goshort) error {
+	tx := db.Save(&goshort)
+	return tx.Error
+}
