@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	model "github.com/himanshu1221/GoShort/Model"
+	"github.com/himanshu1221/GoShort/utils"
 )
 
 func GetAllRedirects(ctx *fiber.Ctx) error {
@@ -34,6 +35,27 @@ func GetRedirect(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(short)
 }
 
+func CreateShort(c *fiber.Ctx) error {
+	c.Accepts("application/json")
+	var short model.Goshort
+	err := c.BodyParser(&short)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "error parsing JSON" + err.Error(),
+		})
+	}
+	if short.Random {
+		short.Goshort = utils.RandomUrl(8)
+	}
+	err = model.CreateShort(short)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "error could not short in DB" + err.Error(),
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(short)
+}
+
 func SetupAndListen() {
 	router := fiber.New()
 
@@ -43,5 +65,6 @@ func SetupAndListen() {
 	}))
 	router.Get("/shorts", GetAllRedirects)
 	router.Get("/shorts/:id", GetRedirect)
+	router.Post("/shorts", CreateShort)
 	router.Listen(":3000")
 }
