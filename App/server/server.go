@@ -74,6 +74,24 @@ func UpdateShorts(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(goshort)
 }
 
+func DeleteShorts(c *fiber.Ctx) error {
+	id, err := strconv.ParseUint(c.Params("id"), 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "could not parse id from URl" + err.Error(),
+		})
+	}
+	err = model.DeleteShort(id)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "could not delete form DB" + err.Error(),
+		})
+	}
+	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+		"message": "could not delte from db" + err.Error(),
+	})
+}
+
 func SetupAndListen() {
 	router := fiber.New()
 
@@ -85,5 +103,6 @@ func SetupAndListen() {
 	router.Get("/shorts/:id", GetRedirect)
 	router.Post("/shorts", CreateShort)
 	router.Patch("/updateshorts", UpdateShorts)
+	router.Delete("/shorts/:id", DeleteShorts)
 	router.Listen(":3000")
 }
