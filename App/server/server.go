@@ -56,6 +56,24 @@ func CreateShort(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(short)
 }
 
+func UpdateShorts(c *fiber.Ctx) error {
+	c.Accepts("applications/json")
+	var goshort model.Goshort
+	err := c.BodyParser(&goshort)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Message could not parse" + err.Error(),
+		})
+	}
+	err = model.UpdateShort(goshort)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Could not update short link in DB" + err.Error(),
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(goshort)
+}
+
 func SetupAndListen() {
 	router := fiber.New()
 
@@ -66,5 +84,6 @@ func SetupAndListen() {
 	router.Get("/shorts", GetAllRedirects)
 	router.Get("/shorts/:id", GetRedirect)
 	router.Post("/shorts", CreateShort)
+	router.Patch("/updateshorts", UpdateShorts)
 	router.Listen(":3000")
 }
