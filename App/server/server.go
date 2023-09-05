@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -8,6 +9,22 @@ import (
 	model "github.com/himanshu1221/GoShort/Model"
 	"github.com/himanshu1221/GoShort/utils"
 )
+
+func Redirect(c *fiber.Ctx) error {
+	ShortsUrl := c.Params("redirects")
+	short, err := model.FindShortByUrl(ShortsUrl)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Could not find SHort in DB" + err.Error(),
+		})
+	}
+	short.Clicked = +1
+	err = model.UpdateShort(short)
+	if err != nil {
+		fmt.Printf("Error Updating")
+	}
+	return c.Redirect(short.Redirect, fiber.StatusTemporaryRedirect)
+}
 
 func GetAllRedirects(ctx *fiber.Ctx) error {
 	shorts, err := model.GetAllShorts()
@@ -99,6 +116,7 @@ func SetupAndListen() {
 		AllowOrigins: "*",
 		AllowHeaders: "Origin,Content-Type,Accept",
 	}))
+	router.Get("/r/:redirect", Redirect)
 	router.Get("/shorts", GetAllRedirects)
 	router.Get("/shorts/:id", GetRedirect)
 	router.Post("/shorts", CreateShort)
